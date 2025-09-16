@@ -1,1 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cat Browser 🐾</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1e1e1e;
+    color: #ddd;
+    cursor: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAh1BMVEX////z8/P19fXr6+v4+Pj29vbX19f6+vr5+fn09PTy8vLb29vR0dHb29vX19fU1NTu7u7T09Pj4+O1tbW+vr7n5+fV1dXo6Oh0dHSiopa9vb3x8fGdnZ1kZGTDw8OqqqqGhoawqTkxMTEyMjLZ2dnx8fG3t7dLS0tvb28wMDBGRkYAAACx3+8vAAAAAXRSTlMAQObYZgAAAIRJREFUGBllwQcSgCAQBEGYQG2m1vv9/uCTl3BkxFh9Jj8sQ8ocW0xkE9s9J8mA+Ynqskv7quc9YXsYje9j1n3x9m3h/wD/AT1wLhDNl/hAAAAAElFTkSuQmCC'), auto;
+  }
+  #browser {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  #tabs {
+    display: flex;
+    background: #2c2c2c;
+    padding: 5px;
+    gap: 5px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 5px 10px;
+    background: #333;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: #4a90e2;
+    color: white;
+  }
+  #controls {
+    display: flex;
+    background: #2c2c2c;
+    padding: 5px;
+    align-items: center;
+    gap: 5px;
+  }
+  #controls input {
+    flex: 1;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #ddd;
+  }
+  #controls button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #4a90e2;
+    color: white;
+    cursor: pointer;
+  }
+  #webview {
+    flex: 1;
+    border: none;
+  }
+</style>
+</head>
+<body>
+<div id="browser">
+  <div id="tabs">
+    <div class="tab active" onclick="switchTab(0)">Tab 1 🐾</div>
+  </div>
+  <div id="controls">
+    <button onclick="goBack()">⬅</button>
+    <button onclick="goForward()">➡</button>
+    <input type="text" id="url" placeholder="Enter URL here...">
+    <button onclick="go()">Go 🐾</button>
+    <button onclick="newTab()">➕</button>
+  </div>
+  <iframe id="webview" src="https://www.google.com"></iframe>
+</div>
 
+<script>
+let tabs = [{url:'https://www.google.com'}];
+let currentTab = 0;
+
+function updateURLInput() {
+  document.getElementById('url').value = tabs[currentTab].url;
+}
+
+function switchTab(index) {
+  currentTab = index;
+  document.getElementById('webview').src = tabs[currentTab].url;
+  updateTabsUI();
+  updateURLInput();
+}
+
+function updateTabsUI() {
+  const tabsDiv = document.getElementById('tabs');
+  tabsDiv.innerHTML = '';
+  tabs.forEach((tab, index) => {
+    const div = document.createElement('div');
+    div.className = 'tab' + (index === currentTab ? ' active' : '');
+    div.innerText = `Tab ${index+1} 🐾`;
+    div.onclick = () => switchTab(index);
+    tabsDiv.appendChild(div);
+  });
+}
+
+function go() {
+  let url = document.getElementById('url').value;
+  if (!url.startsWith('http')) url = 'https://' + url;
+  tabs[currentTab].url = url;
+  document.getElementById('webview').src = url;
+}
+
+function newTab() {
+  tabs.push({url:'https://www.google.com'});
+  switchTab(tabs.length-1);
+}
+
+function goBack() {
+  document.getElementById('webview').contentWindow.history.back();
+}
+
+function goForward() {
+  document.getElementById('webview').contentWindow.history.forward();
+}
+
+updateURLInput();
+</script>
+</body>
+</html>
