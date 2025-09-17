@@ -2,105 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CatBrowser 🐾</title>
-<style>
-  body { margin: 0; font-family: Arial, sans-serif; background:#1e1e2f; color:#fff; }
-  #topbar { display:flex; align-items:center; padding:5px; background:#2a2a3f; }
-  #topbar button { margin-right:5px; background:#444; border:none; color:#fff; padding:5px 10px; cursor:pointer; border-radius:4px; }
-  #topbar input { flex:1; padding:5px; border-radius:4px; border:none; margin-right:5px; }
-  #tabs { display:flex; background:#333; padding:5px; overflow-x:auto; }
-  .tab { background:#555; padding:5px 10px; margin-right:5px; border-radius:4px; cursor:pointer; position:relative; }
-  .tab.active { background:#777; }
-  .tab .close { position:absolute; top:0; right:0; padding:0 5px; cursor:pointer; }
-  iframe { width:100%; height:calc(100vh - 80px); border:none; background:#fff; }
-  #homeScreen { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; color:#fff; font-size:24px; }
-</style>
+<title>Stealth HTML Demo 🐱</title>
 </head>
 <body>
 
-<div id="topbar">
-  <button onclick="goBack()">◀️</button>
-  <button onclick="goForward()">▶️</button>
-  <button onclick="reloadTab()">🔄</button>
-  <button onclick="goHome()">🏠</button>
-  <input type="text" id="urlInput" placeholder="Enter URL and press Enter" onkeydown="enterURL(event)">
-  <button onclick="newTab()">➕ New Tab</button>
-  <button onclick="toggleCatMode()">🐱</button>
-</div>
-
-<div id="tabs"></div>
-
-<div id="browserArea"></div>
+<h1>Super Stealth Mode Obfuscator</h1>
+<textarea id="input" placeholder="Paste your HTML here..." style="width:100%;height:150px;"></textarea>
+<button onclick="obfuscate()">Obfuscate</button>
+<textarea id="output" placeholder="Obfuscated Script will appear here..." style="width:100%;height:150px;"></textarea>
 
 <script>
-let tabs = [];
-let activeTab = null;
-
-function createTab(url = 'home') {
-  const tabId = Date.now();
-  const tabDiv = document.createElement('div');
-  tabDiv.className = 'tab';
-  tabDiv.innerHTML = `<span>${url==='home'?'CatBrowser Home':url}</span><span class="close" onclick="closeTab(${tabId})">✖️</span>`;
-  tabDiv.onclick = () => switchTab(tabId);
-  document.getElementById('tabs').appendChild(tabDiv);
-
-  const iframe = document.createElement('iframe');
-  iframe.src = url==='home'?'about:blank':url;
-  if(url==='home') {
-    iframe.contentDocument.write('<div id="homeScreen">🐾 Welcome to CatBrowser! 🐾<br>Start by typing a URL or opening a new tab!</div>');
-  }
-
-  document.getElementById('browserArea').appendChild(iframe);
-
-  tabs.push({id: tabId, tabDiv, iframe});
-  switchTab(tabId);
+function obfuscate(){
+    let html = document.getElementById("input").value;
+    // Base64 encode the HTML
+    let encoded = btoa(unescape(encodeURIComponent(html)));
+    
+    // Self-obfuscating script
+    let stealthScript = `
+        (function(){
+            var a='${encoded}';
+            var b=decodeURIComponent(escape(atob(a)));
+            document.write(b);
+        })();
+    `;
+    
+    // Encode the script itself
+    let finalEncoded = btoa(unescape(encodeURIComponent(stealthScript)));
+    let finalOutput = `<script>eval(decodeURIComponent(escape(atob('${finalEncoded}'))))<\/script>`;
+    
+    document.getElementById("output").value = finalOutput;
 }
-
-function switchTab(id) {
-  tabs.forEach(t => {
-    t.tabDiv.classList.remove('active');
-    t.iframe.style.display = 'none';
-  });
-  const t = tabs.find(x => x.id === id);
-  if(t){
-    t.tabDiv.classList.add('active');
-    t.iframe.style.display = 'block';
-    activeTab = t;
-  }
-}
-
-function closeTab(id) {
-  const index = tabs.findIndex(t => t.id === id);
-  if(index > -1){
-    document.getElementById('tabs').removeChild(tabs[index].tabDiv);
-    document.getElementById('browserArea').removeChild(tabs[index].iframe);
-    tabs.splice(index,1);
-    if(tabs.length>0) switchTab(tabs[tabs.length-1].id);
-  }
-}
-
-function newTab() { createTab(); }
-
-function enterURL(e) {
-  if(e.key==='Enter' && activeTab){
-    let url = e.target.value;
-    if(!url.startsWith('http')) url='https://'+url;
-    activeTab.iframe.src = url;
-    activeTab.tabDiv.querySelector('span').innerText = url;
-  }
-}
-
-function goBack() { if(activeTab) activeTab.iframe.contentWindow.history.back(); }
-function goForward() { if(activeTab) activeTab.iframe.contentWindow.history.forward(); }
-function reloadTab() { if(activeTab) activeTab.iframe.contentWindow.location.reload(); }
-function goHome() { if(activeTab) { activeTab.iframe.src='about:blank'; activeTab.iframe.contentDocument.write('<div id="homeScreen">🐾 Welcome to CatBrowser! 🐾<br>Start by typing a URL or opening a new tab!</div>'); } }
-
-function toggleCatMode() {
-  document.body.style.background = document.body.style.background==='rgb(30, 30, 47)'?'#ffeedd':'#1e1e2f';
-}
-
-createTab(); // open first home tab
 </script>
+
 </body>
 </html>
